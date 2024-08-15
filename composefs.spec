@@ -24,6 +24,7 @@ BuildRequires:	go-md2man
 BuildRequires:	libfuse3-devel >= 3.10.0
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
+BuildRequires:	rpmbuild(macros) >= 2.009
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
