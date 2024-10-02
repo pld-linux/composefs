@@ -1,3 +1,4 @@
+# TODO: rust
 #
 # Conditional build:
 %bcond_without	man		# man page (requires go-md2man)
@@ -10,18 +11,20 @@
 Summary:	Tools to handle creating and mounting composefs images
 Summary(pl.UTF-8):	Narzędzia do obsługi tworzenia i montowania obrazów composefs
 Name:		composefs
-Version:	1.0.4
+Version:	1.0.6
 Release:	1
 License:	LGPL v2.1+, parts GPL v2 or Apache v2.0 (library), GPL v3+ (tools)
 Group:		Libraries
 #Source0Download: https://github.com/containers/composefs/releases
 Source0:	https://github.com/containers/composefs/releases/download/v%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	91814fcb4b66ce07ced300fc323e3217
+# Source0-md5:	8554c740470b838941a54b17c26bc5b5
 URL:		https://github.com/containers/composefs
 %if %{with man}
 BuildRequires:	go-md2man
 %endif
 BuildRequires:	libfuse3-devel >= 3.10.0
+BuildRequires:	meson
+BuildRequires:	ninja >= 1.5
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 2.009
@@ -87,19 +90,16 @@ Statyczna biblioteka composefs.
 %setup -q
 
 %build
-%configure \
-	%{!?with_man:--disable-man} \
-	%{!?with_static_libs:--disable-static}
-%{__make}
+%meson build \
+	%{!?with_static_libs:--default-library=shared} \
+	%{!?with_man:-Dman=disabled}
+
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
-
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libcomposefs.la
+%ninja_install -C build
 
 %clean
 rm -rf $RPM_BUILD_ROOT
